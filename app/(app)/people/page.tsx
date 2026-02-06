@@ -4,50 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DataTable, Column } from '@/components/data-table';
 import { FilterBar } from '@/components/filter-bar';
-import { StatusPill } from '@/components/status-pill';
-import { CategoryBadge } from '@/components/category-badge';
+import { PersonCardGrid } from '@/components/person-card-grid';
 import { mockPeople, mockDepartments } from '@/lib/mock-data';
-import { Person, PersonStatus, PersonCategory } from '@/types';
-import { Plus } from 'lucide-react';
-
-const personColumns: Column<Person>[] = [
-  {
-    key: 'firstName',
-    label: 'First Name',
-    sortable: true,
-  },
-  {
-    key: 'lastName',
-    label: 'Last Name',
-    sortable: true,
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    sortable: true,
-  },
-  {
-    key: 'position',
-    label: 'Position',
-    sortable: true,
-  },
-  {
-    key: 'department',
-    label: 'Department',
-    sortable: true,
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    sortable: true,
-    render: (value: PersonStatus) => <StatusPill status={value} size="sm" />,
-  },
-];
+import { Plus, List, Grid3x3 } from 'lucide-react';
 
 export default function PeoplePage() {
   const [filteredData, setFilteredData] = useState(mockPeople);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const handleSearch = (query: string) => {
     const filtered = mockPeople.filter(
@@ -107,41 +71,86 @@ export default function PeoplePage() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between accent-line-top pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">People Registry</h1>
-          <p className="text-gray-600 mt-1">Manage your workforce registry</p>
+          <h1 className="text-4xl font-bold text-foreground">People Registry</h1>
+          <p className="text-muted-foreground mt-2">Manage your workforce registry</p>
         </div>
         <Link href="/people/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
+          <Button className="bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white rounded-lg gap-2 px-6">
+            <Plus className="w-4 h-4" />
             Add Person
           </Button>
         </Link>
       </div>
 
-      {/* Filter Bar */}
-      <Card className="p-4">
-        <FilterBar
-          onSearch={handleSearch}
-          onFilterChange={handleFilterChange}
-          filters={filterOptions}
-          searchPlaceholder="Search by name or email..."
-        />
-      </Card>
+      {/* Filter and View Controls */}
+      <div className="space-y-4">
+        <Card className="p-4 bg-card border-border/50 rounded-xl">
+          <FilterBar
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            filters={filterOptions}
+            searchPlaceholder="Search by name or email..."
+          />
+        </Card>
 
-      {/* Data Table */}
-      <Card className="p-6">
-        <DataTable
-          columns={personColumns}
-          data={filteredData}
-          onRowClick={(person) => {
-            window.location.href = `/people/${person.id}`;
+        {/* View Mode Toggle */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredData.length} of {mockPeople.length} employees
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className={`rounded-lg ${viewMode === 'grid' ? 'bg-accent text-white border-accent' : 'border-border/50'}`}
+            >
+              <Grid3x3 className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className={`rounded-lg ${viewMode === 'list' ? 'bg-accent text-white border-accent' : 'border-border/50'}`}
+            >
+              <List className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid View */}
+      {viewMode === 'grid' && (
+        <PersonCardGrid
+          employees={filteredData.map((p) => ({
+            id: p.id,
+            firstName: p.firstName,
+            lastName: p.lastName,
+            email: p.email,
+            phone: p.phone,
+            department: p.department,
+            faculty: p.faculty,
+            jobTitle: p.position,
+            status: p.status,
+            joinDate: p.joinDate,
+            avatar: p.avatar,
+          }))}
+          onViewDetails={(id) => {
+            window.location.href = `/people/${id}`;
           }}
         />
-      </Card>
+      )}
+
+      {/* List View (fallback) */}
+      {viewMode === 'list' && (
+        <Card className="p-6 bg-card border-border/50 rounded-xl">
+          <p className="text-muted-foreground text-center py-8">List view coming soon</p>
+        </Card>
+      )}
     </div>
   );
 }

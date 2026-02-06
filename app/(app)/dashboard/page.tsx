@@ -72,7 +72,7 @@ export default function DashboardPage() {
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between accent-line-top pb-6">
         <div>
           <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground mt-2">Welcome back! Here&apos;s an overview of your workforce.</p>
