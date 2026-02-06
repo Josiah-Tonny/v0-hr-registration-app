@@ -46,20 +46,20 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
     : data;
 
   if (isLoading) {
-    return <div className="p-8 text-center text-gray-500">Loading...</div>;
+    return <div className="p-8 text-center text-muted-foreground">Loading...</div>;
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 overflow-hidden">
+    <div className="rounded-lg border border-border/50 overflow-hidden bg-secondary/20">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50">
+          <TableRow className="bg-secondary/40 border-b border-border/50 hover:bg-secondary/40">
             {columns.map((column) => (
-              <TableHead key={String(column.key)} className="font-semibold text-gray-700">
+              <TableHead key={String(column.key)} className="font-600 text-foreground h-12">
                 {column.sortable ? (
                   <button
                     onClick={() => handleSort(column.key)}
-                    className="flex items-center gap-2 hover:text-gray-900"
+                    className="flex items-center gap-2 hover:text-accent transition-colors"
                   >
                     {column.label}
                     {sortConfig?.key === column.key && (
@@ -76,7 +76,7 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
         <TableBody>
           {sortedData.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
                 No data found
               </TableCell>
             </TableRow>
@@ -85,10 +85,10 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
               <TableRow
                 key={row.id}
                 onClick={() => onRowClick?.(row)}
-                className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
+                className={`border-b border-border/30 ${onRowClick ? 'cursor-pointer hover:bg-secondary/50 transition-colors' : ''}`}
               >
                 {columns.map((column) => (
-                  <TableCell key={String(column.key)} className="text-gray-900">
+                  <TableCell key={String(column.key)} className="text-foreground/80 py-3">
                     {column.render ? column.render(row[column.key], row) : String(row[column.key])}
                   </TableCell>
                 ))}
