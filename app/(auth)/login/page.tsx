@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <Card className="p-8 shadow-2xl bg-card border-border/50 rounded-xl">
       <div className="flex flex-col items-center gap-4 mb-8 accent-line-top pb-8">
-        <div className="w-14 h-14 bg-gradient-to-br from-accent to-accent-secondary rounded-xl flex items-center justify-center shadow-lg">
+        <div className="w-14 h-14 bg-gradient-to-br from-accent via-accent to-[hsl(var(--accent-secondary))] rounded-xl flex items-center justify-center shadow-lg">
           <LogIn className="w-7 h-7 text-white" />
         </div>
         <div className="text-center">
@@ -83,7 +83,7 @@ export default function LoginPage() {
 
         <Button 
           type="submit" 
-          className="w-full h-11 bg-gradient-to-r from-accent to-accent-secondary hover:from-accent/90 hover:to-accent-secondary/90 text-white font-500 rounded-lg mt-6" 
+          className="w-full h-11 bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white font-500 rounded-lg mt-6" 
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign In'}

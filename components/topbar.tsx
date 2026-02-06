@@ -39,7 +39,7 @@ export function Topbar() {
           </div>
           <Avatar className="border border-border/50 bg-secondary/50">
             <AvatarImage src={mockCurrentUser.avatar || "/placeholder.svg"} alt={mockCurrentUser.name} />
-            <AvatarFallback className="bg-gradient-to-br from-accent to-accent-secondary text-white font-bold">{mockCurrentUser.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="bg-gradient-to-br from-accent via-accent to-[hsl(var(--accent-secondary))] text-white font-bold">{mockCurrentUser.name.charAt(0)}</AvatarFallback>
           </Avatar>
         </div>
       </div>

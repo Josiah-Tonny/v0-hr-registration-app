@@ -78,7 +78,7 @@ export default function DashboardPage() {
           <p className="text-muted-foreground mt-2">Welcome back! Here&apos;s an overview of your workforce.</p>
         </div>
         <Link href="/people/new">
-          <Button className="bg-gradient-to-r from-accent to-accent-secondary hover:from-accent/90 hover:to-accent-secondary/90 text-white rounded-lg gap-2 px-6">
+          <Button className="bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white rounded-lg gap-2 px-6">
             <Plus className="w-4 h-4" />
             Add New Person
           </Button>

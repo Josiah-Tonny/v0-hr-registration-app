@@ -24,7 +24,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border accent-line-top">
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent via-accent to-[hsl(var(--accent-secondary))] flex items-center justify-center">
             <span className="text-white text-sm font-bold">N</span>
           </div>
           <h1 className="text-lg font-bold text-sidebar-foreground">NGK HR</h1>
