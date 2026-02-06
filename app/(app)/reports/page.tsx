@@ -24,29 +24,32 @@ const REPORT_TYPES = [
 
 export default function ReportsPage() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-        <p className="text-gray-600 mt-1">Generate and export workforce reports</p>
+      <div className="accent-line-top pb-6">
+        <h1 className="text-4xl font-bold text-foreground">Reports</h1>
+        <p className="text-muted-foreground mt-2">Generate and export workforce reports</p>
       </div>
 
       {/* Report Generator */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Generate Report</h2>
+      <Card className="p-6 bg-card border-border/50 hover:border-border/80 rounded-xl">
+        <h2 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+          <Filter className="w-5 h-5 text-accent" />
+          Generate Report
+        </h2>
 
         <div className="space-y-4">
           {/* Report Type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="report-type">Report Type</Label>
+              <Label htmlFor="report-type" className="text-foreground font-500">Report Type</Label>
               <Select>
-                <SelectTrigger id="report-type" className="mt-2">
+                <SelectTrigger id="report-type" className="mt-2 h-10 bg-secondary/40 border-border/50 rounded-lg focus:border-accent">
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border rounded-lg">
                   {REPORT_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
+                    <SelectItem key={type.value} value={type.value} className="hover:bg-secondary/50">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -56,14 +59,14 @@ export default function ReportsPage() {
 
             {/* Department Filter */}
             <div>
-              <Label htmlFor="department">Department (Optional)</Label>
+              <Label htmlFor="department" className="text-foreground font-500">Department (Optional)</Label>
               <Select>
-                <SelectTrigger id="department" className="mt-2">
+                <SelectTrigger id="department" className="mt-2 h-10 bg-secondary/40 border-border/50 rounded-lg focus:border-accent">
                   <SelectValue placeholder="All departments" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border rounded-lg">
                   {mockDepartments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
+                    <SelectItem key={dept.id} value={dept.id} className="hover:bg-secondary/50">
                       {dept.name}
                     </SelectItem>
                   ))}
@@ -75,22 +78,22 @@ export default function ReportsPage() {
           {/* Date Range */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="start-date">Start Date (Optional)</Label>
-              <Input id="start-date" type="date" className="mt-2" />
+              <Label htmlFor="start-date" className="text-foreground font-500">Start Date (Optional)</Label>
+              <Input id="start-date" type="date" className="mt-2 h-10 bg-secondary/40 border-border/50 rounded-lg focus:border-accent" />
             </div>
             <div>
-              <Label htmlFor="end-date">End Date (Optional)</Label>
-              <Input id="end-date" type="date" className="mt-2" />
+              <Label htmlFor="end-date" className="text-foreground font-500">End Date (Optional)</Label>
+              <Input id="end-date" type="date" className="mt-2 h-10 bg-secondary/40 border-border/50 rounded-lg focus:border-accent" />
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button className="flex items-center gap-2">
+            <Button className="bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white rounded-lg gap-2">
               <Filter className="w-4 h-4" />
               Generate Report
             </Button>
-            <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+            <Button variant="outline" className="border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg gap-2">
               <Download className="w-4 h-4" />
               Export as CSV
             </Button>
@@ -99,8 +102,11 @@ export default function ReportsPage() {
       </Card>
 
       {/* Recent Reports */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Reports</h2>
+      <Card className="p-6 bg-card border-border/50 hover:border-border/80 rounded-xl">
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Download className="w-5 h-5 text-accent" />
+          Recent Reports
+        </h2>
 
         <div className="space-y-3">
           {[
@@ -108,12 +114,12 @@ export default function ReportsPage() {
             { name: 'Department Summary', date: '2024-01-30', type: 'department_summary' },
             { name: 'Contract Expiry Alert', date: '2024-01-28', type: 'contract_expiry' },
           ].map((report, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded border border-gray-200">
+            <div key={index} className="flex items-center justify-between p-4 bg-secondary/30 hover:bg-secondary/50 rounded-lg border border-border/30 transition-colors">
               <div>
-                <p className="font-medium text-gray-900">{report.name}</p>
-                <p className="text-sm text-gray-500">{report.date}</p>
+                <p className="font-medium text-foreground">{report.name}</p>
+                <p className="text-sm text-muted-foreground">{report.date}</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg">
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
