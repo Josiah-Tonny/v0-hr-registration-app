@@ -72,15 +72,15 @@ export default function DashboardPage() {
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between accent-line-top pb-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Welcome back! Here&apos;s an overview of your workforce.</p>
+          <h1 className="text-3xl font-700 text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-1">Workforce overview and metrics</p>
         </div>
         <Link href="/people/new">
-          <Button className="bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white rounded-lg gap-2 px-6">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-10">
             <Plus className="w-4 h-4" />
-            Add New Person
+            Add Employee
           </Button>
         </Link>
       </div>
@@ -90,14 +90,14 @@ export default function DashboardPage() {
         {METRICS.map((metric) => {
           const Icon = metric.icon;
           return (
-            <Card key={metric.label} className="p-6 bg-card border-border/50 hover:border-border/80 hover:shadow-lg transition-all duration-300 rounded-xl">
-              <div className="space-y-4">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${metric.bgColor}`}>
-                  <Icon className={`w-6 h-6 ${metric.color}`} />
+            <Card key={metric.label} className="p-6 bg-card border-border/40 hover:bg-card/80 hover:border-border/60 transition-all duration-200">
+              <div className="space-y-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${metric.bgColor}`}>
+                  <Icon className={`w-5 h-5 ${metric.color}`} />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground font-500">{metric.label}</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{metric.value}</p>
+                  <p className="text-xs text-muted-foreground font-600 uppercase tracking-wide">{metric.label}</p>
+                  <p className="text-2xl font-700 text-foreground mt-2">{metric.value}</p>
                 </div>
               </div>
             </Card>
@@ -108,31 +108,31 @@ export default function DashboardPage() {
       {/* Tables Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Contracts Ending Soon */}
-        <Card className="p-6 bg-card border-border/50 hover:border-border/80 rounded-xl transition-all duration-300">
-          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-amber-400" />
-            Contracts Ending Soon
+        <Card className="p-6 bg-card border-border/40 hover:bg-card/80 transition-all duration-200">
+          <h2 className="text-sm font-700 text-foreground mb-5 flex items-center gap-2 uppercase tracking-wide">
+            <AlertCircle className="w-4 h-4 text-amber-400" />
+            Contracts Ending
           </h2>
           {expiringPeople.length > 0 ? (
             <DataTable columns={peopleColumns} data={expiringPeople} />
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No contracts ending soon</p>
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No contracts ending soon
             </div>
           )}
         </Card>
 
         {/* Recently Added */}
-        <Card className="p-6 bg-card border-border/50 hover:border-border/80 rounded-xl transition-all duration-300">
-          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-emerald-400" />
+        <Card className="p-6 bg-card border-border/40 hover:bg-card/80 transition-all duration-200">
+          <h2 className="text-sm font-700 text-foreground mb-5 flex items-center gap-2 uppercase tracking-wide">
+            <UserCheck className="w-4 h-4 text-emerald-400" />
             Recently Added
           </h2>
           {recentlyAddedPeople.length > 0 ? (
             <DataTable columns={peopleColumns} data={recentlyAddedPeople} />
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No recently added people</p>
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No recently added employees
             </div>
           )}
         </Card>

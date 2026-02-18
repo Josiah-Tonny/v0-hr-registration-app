@@ -50,20 +50,20 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
   }
 
   return (
-    <div className="rounded-lg border border-border/50 overflow-hidden bg-secondary/20">
+    <div className="rounded-lg border border-border/40 overflow-hidden bg-background/40">
       <Table>
         <TableHeader>
-          <TableRow className="bg-secondary/40 border-b border-border/50 hover:bg-secondary/40">
+          <TableRow className="bg-secondary/30 border-b border-border/40 hover:bg-secondary/30">
             {columns.map((column) => (
-              <TableHead key={String(column.key)} className="font-600 text-foreground h-12">
+              <TableHead key={String(column.key)} className="font-700 text-foreground h-11 text-xs uppercase tracking-wide">
                 {column.sortable ? (
                   <button
                     onClick={() => handleSort(column.key)}
-                    className="flex items-center gap-2 hover:text-accent transition-colors"
+                    className="flex items-center gap-2 hover:text-primary transition-colors"
                   >
                     {column.label}
                     {sortConfig?.key === column.key && (
-                      <>{sortConfig.direction === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</>
+                      <>{sortConfig.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</>
                     )}
                   </button>
                 ) : (
@@ -76,7 +76,7 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
         <TableBody>
           {sortedData.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground text-sm">
                 No data found
               </TableCell>
             </TableRow>
@@ -85,10 +85,10 @@ export function DataTable<T extends { id: string }>({ columns, data, isLoading, 
               <TableRow
                 key={row.id}
                 onClick={() => onRowClick?.(row)}
-                className={`border-b border-border/30 ${onRowClick ? 'cursor-pointer hover:bg-secondary/50 transition-colors' : ''}`}
+                className={`border-b border-border/20 ${onRowClick ? 'cursor-pointer hover:bg-secondary/40 transition-colors' : ''}`}
               >
                 {columns.map((column) => (
-                  <TableCell key={String(column.key)} className="text-foreground/80 py-3">
+                  <TableCell key={String(column.key)} className="text-foreground/90 py-3 text-sm">
                     {column.render ? column.render(row[column.key], row) : String(row[column.key])}
                   </TableCell>
                 ))}

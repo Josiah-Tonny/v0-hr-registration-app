@@ -73,41 +73,41 @@ export default function PeoplePage() {
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between accent-line-top pb-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-foreground">People Registry</h1>
-          <p className="text-muted-foreground mt-2">Manage your workforce registry</p>
+          <h1 className="text-3xl font-700 text-foreground">Employee Registry</h1>
+          <p className="text-muted-foreground text-sm mt-1">Manage and view all employees</p>
         </div>
         <Link href="/people/new">
-          <Button className="bg-gradient-to-r from-accent via-accent to-[hsl(var(--accent-secondary))] hover:from-accent/90 hover:via-accent/90 hover:to-[hsl(var(--accent-secondary))/90] text-white rounded-lg gap-2 px-6">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-10">
             <Plus className="w-4 h-4" />
-            Add Person
+            Add Employee
           </Button>
         </Link>
       </div>
 
       {/* Filter and View Controls */}
       <div className="space-y-4">
-        <Card className="p-4 bg-card border-border/50 rounded-xl">
+        <Card className="p-4 bg-card border-border/40">
           <FilterBar
             onSearch={handleSearch}
             onFilterChange={handleFilterChange}
             filters={filterOptions}
-            searchPlaceholder="Search by name or email..."
+            searchPlaceholder="Search employees..."
           />
         </Card>
 
         {/* View Mode Toggle */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredData.length} of {mockPeople.length} employees
+          <p className="text-sm text-muted-foreground font-500">
+            {filteredData.length} of {mockPeople.length} employees
           </p>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setViewMode('grid')}
-              className={`rounded-lg ${viewMode === 'grid' ? 'bg-accent text-white border-accent' : 'border-border/50'}`}
+              className={`h-9 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground border-primary' : 'border-border/40'}`}
             >
               <Grid3x3 className="w-4 h-4" />
             </Button>
@@ -115,7 +115,7 @@ export default function PeoplePage() {
               variant="outline"
               size="sm"
               onClick={() => setViewMode('list')}
-              className={`rounded-lg ${viewMode === 'list' ? 'bg-accent text-white border-accent' : 'border-border/50'}`}
+              className={`h-9 ${viewMode === 'list' ? 'bg-primary text-primary-foreground border-primary' : 'border-border/40'}`}
             >
               <List className="w-4 h-4" />
             </Button>
@@ -147,8 +147,8 @@ export default function PeoplePage() {
 
       {/* List View (fallback) */}
       {viewMode === 'list' && (
-        <Card className="p-6 bg-card border-border/50 rounded-xl">
-          <p className="text-muted-foreground text-center py-8">List view coming soon</p>
+        <Card className="p-6 bg-card border-border/40">
+          <p className="text-muted-foreground text-center py-8 text-sm">List view coming soon</p>
         </Card>
       )}
     </div>
