@@ -19,16 +19,20 @@ export function ModernCard({
   return (
     <Card
       className={`
-        p-6 bg-card border-border/50 rounded-xl
-        ${hoverable ? 'hover:border-border/80 hover:shadow-lg transition-all duration-300' : ''}
+        p-6 bg-card/60 backdrop-blur-sm border border-border/40 rounded-xl
+        ${hoverable ? 'hover:bg-card/80 hover:border-border/60 hover:shadow-sm transition-all duration-250' : ''}
         ${className}
       `}
       {...props}
     >
       {title && (
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/30">
-          {icon && <div className="text-xl">{icon}</div>}
-          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/25">
+          {icon && (
+            <div className="text-lg text-accent/80 flex-shrink-0">
+              {icon}
+            </div>
+          )}
+          <h2 className="text-lg font-600 text-foreground tracking-tight">{title}</h2>
         </div>
       )}
       {children}
