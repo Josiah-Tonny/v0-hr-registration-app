@@ -14,6 +14,10 @@ body {
     text-wrap: balance;
   }
   
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
   /* Modern glassmorphism effect */
   .glass-effect {
     @apply backdrop-blur-xl bg-white/10 border border-white/20;
@@ -24,7 +28,7 @@ body {
     @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950;
   }
   
-  /* Abstract accent shapes */
+  /* Subtle accent line for sections */
   .accent-line-top {
     position: relative;
   }
@@ -35,8 +39,36 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
+    height: 2px;
     background: linear-gradient(90deg, transparent, hsl(var(--accent)), transparent);
+    opacity: 0.6;
+  }
+  
+  /* Smooth shadows for cards */
+  .card-shadow {
+    @apply shadow-sm shadow-black/20;
+  }
+  
+  .card-shadow-hover {
+    @apply hover:shadow-md hover:shadow-black/30 transition-shadow duration-200;
+  }
+  
+  /* Smooth focus ring for inputs */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background;
+  }
+  
+  /* Professional text styles */
+  .text-headline {
+    @apply text-3xl font-700 tracking-tight;
+  }
+  
+  .text-subheadline {
+    @apply text-lg font-600 tracking-tight;
+  }
+  
+  .text-label {
+    @apply text-sm font-500 uppercase tracking-wider;
   }
 }
 
