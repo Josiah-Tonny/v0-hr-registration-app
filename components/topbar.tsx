@@ -40,12 +40,6 @@ export function Topbar() {
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-600 text-foreground">{mockCurrentUser.name}</p>
-            <p className="text-xs text-muted-foreground">{mockCurrentUser.role.replace(/_/g, ' ')}</p>
-          </div>
-          <Avatar className="h-8 w-8 border border-border/40">
-            <AvatarImage src={mockCurrentUser.avatar || "/placeholder.svg"} alt={mockCurrentUser.name} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-600">{mockCurrentUser.name.charAt(0)}</AvatarFallback>
             <p className="text-sm font-500 text-foreground">{currentUser.name}</p>
             <p className="text-xs text-muted-foreground">{currentUser.role.replace(/_/g, ' ')}</p>
           </div>
