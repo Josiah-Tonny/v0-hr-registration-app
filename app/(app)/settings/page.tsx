@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
-import { mockDepartments, mockFaculties } from '@/lib/mock-data';
 
 export default function SettingsPage() {
   const [departments, setDepartments] = useState(mockDepartments);

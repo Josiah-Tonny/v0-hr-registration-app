@@ -4,10 +4,18 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DataTable, Column } from '@/components/data-table';
 import { StatusPill } from '@/components/status-pill';
-import { mockPeople, mockDashboardMetrics } from '@/lib/mock-data';
 import { Person } from '@/types';
 import { Users, UserCheck, AlertCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
+
+const mockDashboardMetrics = {
+  totalEmployees: 0,
+  activeEmployees: 0,
+  contractsEnding: 0,
+  recentlyAdded: 0,
+};
+
+const mockPeople: Person[] = [];
 
 const METRICS = [
   {
@@ -66,7 +74,9 @@ const peopleColumns: Column<Person>[] = [
 ];
 
 const expiringPeople = mockPeople.filter((p) => p.status === 'contract_ending');
-const recentlyAddedPeople = [...mockPeople].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3);
+const recentlyAddedPeople = [...mockPeople]
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  .slice(0, 3);
 
 export default function DashboardPage() {
   return (

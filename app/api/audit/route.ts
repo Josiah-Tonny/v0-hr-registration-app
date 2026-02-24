@@ -8,8 +8,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
 
     const { data, error } = await fetchAuditLogs({
-      entityType,
-      limit
+      personId: entityType,
     });
 
     if (error) {

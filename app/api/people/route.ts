@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchEmployees, createEmployee } from '@/services/database';
+import { fetchPeople, createPerson } from '@/services/database';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const department = searchParams.get('department') || undefined;
     const status = searchParams.get('status') || undefined;
+    const category = searchParams.get('category') || undefined;
     const searchQuery = searchParams.get('search') || undefined;
 
-    const { data, error } = await fetchEmployees({
+    const { data, error } = await fetchPeople({
       department,
       status,
-      searchQuery
+      category,
+      search: searchQuery
     });
 
     if (error) {
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch employees' },
+      { error: 'Failed to fetch people' },
       { status: 500 }
     );
   }
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { data, error } = await createEmployee(body);
+    const { data, error } = await createPerson(body);
 
     if (error) {
       return NextResponse.json(
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to create employee' },
+      { error: 'Failed to create person' },
       { status: 500 }
     );
   }

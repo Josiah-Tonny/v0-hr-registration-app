@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FilterBar } from '@/components/filter-bar';
 import { PersonCardGrid } from '@/components/person-card-grid';
-import { mockPeople, mockDepartments } from '@/lib/mock-data';
 import { Plus, List, Grid3x3 } from 'lucide-react';
 
 export default function PeoplePage() {

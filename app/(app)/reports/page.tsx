@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Download, Filter } from 'lucide-react';
-import { mockDepartments } from '@/lib/mock-data';
 
 const REPORT_TYPES = [
   { value: 'employee_census', label: 'Employee Census' },

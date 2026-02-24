@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Upload, Folder, File, Download, Trash2, Search, Plus, Home } from 'lucide-react';
-import { mockDocuments } from '@/lib/mock-data';
 
 type FileItem = {
   id: string;

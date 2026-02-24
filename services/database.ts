@@ -1,328 +1,347 @@
-'use server'
+import { Pool } from "@neondatabase/serverless";
+import { Person, Department, Faculty, Document, TimelineEvent, AuditLog } from "@/types";
 
-import { supabase, type Database } from '@/lib/supabase'
+const pool = new Pool({
+  connectionString: process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL,
+});
 
-// EMPLOYEES
-export async function fetchEmployees(filters?: {
-  department?: string
-  status?: string
-  searchQuery?: string
-}) {
+type DbResponse<T> = { data: T | null; error: string | null };
+
+function dbRowToPerson(row: any): Person {
+  return {
+    id: row.id,
+    employee_id: row.employee_id,
+    first_name: row.first_name,
+    middle_name: row.middle_name,
+    last_name: row.last_name,
+    email: row.email,
+    secondary_email: row.secondary_email,
+    phone_number: row.phone_number,
+    secondary_phone_number: row.secondary_phone_number,
+    date_of_birth: row.date_of_birth,
+    gender: row.gender,
+    nationality: row.nationality,
+    id_number: row.id_number,
+    passport_number: row.passport_number,
+    residential_address: row.residential_address,
+    postal_code: row.postal_code,
+    city: row.city,
+    country: row.country,
+    department_id: row.department_id,
+    faculty_id: row.faculty_id,
+    position: row.position,
+    position_grade: row.position_grade,
+    work_location: row.work_location,
+    shift_information: row.shift_information,
+    status: row.status,
+    category: row.category,
+    categoryDetails: parseCategoryDetails(row.category_details),
+    start_date: row.start_date,
+    end_date: row.end_date,
+    expected_end_date: row.expected_end_date,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
+function parseCategoryDetails(json: string | null): any {
+  if (!json) return {};
   try {
-    let query = supabase
-      .from('employees')
-      .select(`
-        *,
-        department:departments(*),
-        faculty:faculties(*),
-        role:employee_roles(*),
-        status:employee_statuses(*)
-      `)
+    return JSON.parse(json);
+  } catch (e) {
+    console.error("Failed to parse category_details:", e);
+    return {};
+  }
+}
+
+export async function fetchPeople(filters?: {
+  department?: string;
+  status?: string;
+  category?: string;
+  search?: string;
+}): Promise<DbResponse<Person[]>> {
+  try {
+    let query = "SELECT * FROM employees WHERE 1=1";
+    const params: any[] = [];
+    let paramCount = 1;
 
     if (filters?.department) {
-      query = query.eq('department_id', filters.department)
+      query += ` AND department_id = $${paramCount++}`;
+      params.push(filters.department);
     }
-
     if (filters?.status) {
-      query = query.eq('status_id', filters.status)
+      query += ` AND status = $${paramCount++}`;
+      params.push(filters.status);
+    }
+    if (filters?.category) {
+      query += ` AND category = $${paramCount++}`;
+      params.push(filters.category);
+    }
+    if (filters?.search) {
+      query += ` AND (first_name ILIKE $${paramCount} OR last_name ILIKE $${paramCount + 1} OR employee_id ILIKE $${paramCount + 2})`;
+      const searchParam = "%" + filters.search + "%";
+      params.push(searchParam, searchParam, searchParam);
+      paramCount += 3;
     }
 
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error fetching employees:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching employees:', err)
-    return { data: [], error: 'Failed to fetch employees' }
+    query += " ORDER BY created_at DESC";
+    const result = await pool.query(query, params);
+    const people = result.rows.map(dbRowToPerson);
+    return { data: people, error: null };
+  } catch (error: any) {
+    console.error("Error fetching people:", error);
+    return { data: null, error: error.message };
   }
 }
 
-export async function fetchEmployeeById(id: string) {
+export async function fetchPersonById(id: string): Promise<DbResponse<Person>> {
   try {
-    const { data, error } = await supabase
-      .from('employees')
-      .select(`
-        *,
-        department:departments(*),
-        faculty:faculties(*),
-        role:employee_roles(*),
-        status:employee_statuses(*)
-      `)
-      .eq('id', id)
-      .single()
-
-    if (error) {
-      console.error('Error fetching employee:', error)
-      return { data: null, error: error.message }
+    const result = await pool.query("SELECT * FROM employees WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      return { data: null, error: "Person not found" };
     }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching employee:', err)
-    return { data: null, error: 'Failed to fetch employee' }
+    return { data: dbRowToPerson(result.rows[0]), error: null };
+  } catch (error: any) {
+    console.error("Error fetching person:", error);
+    return { data: null, error: error.message };
   }
 }
 
-export async function createEmployee(employee: Database['public']['Tables']['employees']['Insert']) {
+export async function createPerson(person: Omit<Person, "id" | "created_at" | "updated_at">): Promise<DbResponse<Person>> {
   try {
-    const { data, error } = await supabase
-      .from('employees')
-      .insert([employee])
-      .select()
-      .single()
+    const sql = `INSERT INTO employees (
+      employee_id, first_name, middle_name, last_name, email, secondary_email, 
+      phone_number, secondary_phone_number, date_of_birth, gender, nationality, 
+      id_number, passport_number, residential_address, postal_code, city, country, 
+      department_id, faculty_id, position, position_grade, work_location, 
+      shift_information, status, category, category_details, start_date, 
+      end_date, expected_end_date
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
+    RETURNING id`;
 
-    if (error) {
-      console.error('Error creating employee:', error)
-      return { data: null, error: error.message }
-    }
+    const result = await pool.query(sql, [
+      person.employee_id, person.first_name, person.middle_name, person.last_name,
+      person.email, person.secondary_email, person.phone_number, person.secondary_phone_number,
+      person.date_of_birth, person.gender, person.nationality, person.id_number,
+      person.passport_number, person.residential_address, person.postal_code, person.city,
+      person.country, person.department_id, person.faculty_id, person.position,
+      person.position_grade, person.work_location, person.shift_information, person.status,
+      person.category, JSON.stringify(person.categoryDetails || {}), person.start_date,
+      person.end_date, person.expected_end_date
+    ]);
 
-    // Log the action
-    await logAuditEntry({
-      action: 'CREATE',
-      entity_type: 'employee',
-      entity_id: data.id,
-      changes: employee
-    })
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error creating employee:', err)
-    return { data: null, error: 'Failed to create employee' }
+    return fetchPersonById(result.rows[0].id);
+  } catch (error: any) {
+    console.error("Error creating person:", error);
+    return { data: null, error: error.message };
   }
 }
 
-export async function updateEmployee(id: string, updates: Database['public']['Tables']['employees']['Update']) {
+export async function updatePerson(id: string, updates: Partial<Person>): Promise<DbResponse<Person>> {
   try {
-    const { data, error } = await supabase
-      .from('employees')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
 
-    if (error) {
-      console.error('Error updating employee:', error)
-      return { data: null, error: error.message }
+    Object.keys(updates).forEach((key) => {
+      if (key === "id" || key === "created_at" || key === "updated_at") return;
+      if (key === "categoryDetails") {
+        fields.push(`category_details = $${paramCount++}`);
+        values.push(JSON.stringify(updates.categoryDetails));
+      } else {
+        fields.push(`${key} = $${paramCount++}`);
+        values.push((updates as any)[key]);
+      }
+    });
+
+    if (fields.length === 0) {
+      return fetchPersonById(id);
     }
 
-    // Log the action
-    await logAuditEntry({
-      action: 'UPDATE',
-      entity_type: 'employee',
-      entity_id: id,
-      changes: updates
-    })
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error updating employee:', err)
-    return { data: null, error: 'Failed to update employee' }
+    fields.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+    
+    const query = `UPDATE employees SET ${fields.join(", ")} WHERE id = $${paramCount}`;
+    await pool.query(query, values);
+    return fetchPersonById(id);
+  } catch (error: any) {
+    console.error("Error updating person:", error);
+    return { data: null, error: error.message };
   }
 }
 
-export async function deleteEmployee(id: string) {
+export async function fetchDepartments(): Promise<DbResponse<Department[]>> {
   try {
-    const { error } = await supabase
-      .from('employees')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error deleting employee:', error)
-      return { data: null, error: error.message }
-    }
-
-    // Log the action
-    await logAuditEntry({
-      action: 'DELETE',
-      entity_type: 'employee',
-      entity_id: id,
-      changes: null
-    })
-
-    return { data: { success: true }, error: null }
-  } catch (err) {
-    console.error('Unexpected error deleting employee:', err)
-    return { data: null, error: 'Failed to delete employee' }
+    const result = await pool.query("SELECT * FROM departments ORDER BY name");
+    return { data: result.rows as Department[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching departments:", error);
+    return { data: null, error: error.message };
   }
 }
 
-// DOCUMENTS
-export async function fetchDocuments(employeeId?: string) {
+export async function fetchFaculties(): Promise<DbResponse<Faculty[]>> {
   try {
-    let query = supabase
-      .from('documents')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (employeeId) {
-      query = query.eq('employee_id', employeeId)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error fetching documents:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching documents:', err)
-    return { data: [], error: 'Failed to fetch documents' }
+    const result = await pool.query("SELECT * FROM faculties ORDER BY name");
+    return { data: result.rows as Faculty[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching faculties:", error);
+    return { data: null, error: error.message };
   }
 }
 
-export async function uploadDocument(document: Database['public']['Tables']['documents']['Insert']) {
+export async function fetchDocumentsByPersonId(personId: string): Promise<DbResponse<Document[]>> {
   try {
-    const { data, error } = await supabase
-      .from('documents')
-      .insert([document])
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error uploading document:', error)
-      return { data: null, error: error.message }
-    }
-
-    // Log the action
-    await logAuditEntry({
-      action: 'UPLOAD',
-      entity_type: 'document',
-      entity_id: data.id,
-      changes: { file: document.file_name }
-    })
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error uploading document:', err)
-    return { data: null, error: 'Failed to upload document' }
+    const result = await pool.query(
+      "SELECT * FROM documents WHERE employee_id = $1 ORDER BY created_at DESC",
+      [personId]
+    );
+    return { data: result.rows as Document[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching documents:", error);
+    return { data: null, error: error.message };
   }
 }
 
-// DEPARTMENTS
-export async function fetchDepartments() {
+export async function fetchDocuments(filters?: {
+  personId?: string;
+  type?: string;
+}): Promise<DbResponse<Document[]>> {
   try {
-    const { data, error } = await supabase
-      .from('departments')
-      .select('*')
-      .order('name')
+    let query = "SELECT * FROM documents WHERE 1=1";
+    const params: any[] = [];
+    let paramCount = 1;
 
-    if (error) {
-      console.error('Error fetching departments:', error)
-      return { data: [], error: error.message }
+    if (filters?.personId) {
+      query += ` AND employee_id = $${paramCount++}`;
+      params.push(filters.personId);
+    }
+    if (filters?.type) {
+      query += ` AND category = $${paramCount++}`;
+      params.push(filters.type);
     }
 
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching departments:', err)
-    return { data: [], error: 'Failed to fetch departments' }
+    query += " ORDER BY created_at DESC";
+    const result = await pool.query(query, params);
+    return { data: result.rows as Document[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching documents:", error);
+    return { data: null, error: error.message };
   }
 }
 
-// FACULTIES
-export async function fetchFaculties() {
+export async function uploadDocument(doc: Omit<Document, "id" | "created_at" | "updated_at">): Promise<DbResponse<Document>> {
   try {
-    const { data, error } = await supabase
-      .from('faculties')
-      .select('*')
-      .order('name')
+    const sql = `INSERT INTO documents (employee_id, title, category, file_name, file_url, file_size, file_type, uploaded_by) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
-    if (error) {
-      console.error('Error fetching faculties:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching faculties:', err)
-    return { data: [], error: 'Failed to fetch faculties' }
+    const result = await pool.query(sql, [
+      doc.person_id, doc.title || "Untitled", doc.type || "general", doc.file_name,
+      doc.file_path, doc.file_size, doc.file_type || "application/octet-stream",
+      doc.uploaded_by || "system"
+    ]);
+    
+    return { data: result.rows[0] as Document, error: null };
+  } catch (error: any) {
+    console.error("Error uploading document:", error);
+    return { data: null, error: error.message };
   }
 }
 
-// STATUSES
-export async function fetchEmployeeStatuses() {
+export async function fetchTimelineEventsByPersonId(personId: string): Promise<DbResponse<TimelineEvent[]>> {
   try {
-    const { data, error } = await supabase
-      .from('employee_statuses')
-      .select('*')
-
-    if (error) {
-      console.error('Error fetching statuses:', error)
-      return { data: [], error: error.message }
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = "timeline_events"
+      );
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      return { data: [], error: null };
     }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching statuses:', err)
-    return { data: [], error: 'Failed to fetch statuses' }
+    
+    const result = await pool.query(
+      "SELECT * FROM timeline_events WHERE person_id = $1 ORDER BY event_date DESC",
+      [personId]
+    );
+    return { data: result.rows as TimelineEvent[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching timeline events:", error);
+    return { data: [], error: null };
   }
 }
 
-// ROLES
-export async function fetchEmployeeRoles() {
+export async function fetchAuditLogs(filters?: {
+  personId?: string;
+  action?: string;
+  performedBy?: string;
+}): Promise<DbResponse<AuditLog[]>> {
   try {
-    const { data, error } = await supabase
-      .from('employee_roles')
-      .select('*')
+    let query = "SELECT * FROM audit_logs WHERE 1=1";
+    const params: any[] = [];
+    let paramCount = 1;
 
-    if (error) {
-      console.error('Error fetching roles:', error)
-      return { data: [], error: error.message }
+    if (filters?.personId) {
+      query += ` AND entity_id = $${paramCount++}`;
+      params.push(filters.personId);
+    }
+    if (filters?.action) {
+      query += ` AND action = $${paramCount++}`;
+      params.push(filters.action);
+    }
+    if (filters?.performedBy) {
+      query += ` AND user_id = $${paramCount++}`;
+      params.push(filters.performedBy);
     }
 
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching roles:', err)
-    return { data: [], error: 'Failed to fetch roles' }
+    query += " ORDER BY created_at DESC";
+    const result = await pool.query(query, params);
+    return { data: result.rows as AuditLog[], error: null };
+  } catch (error: any) {
+    console.error("Error fetching audit logs:", error);
+    return { data: null, error: error.message };
   }
 }
 
-// AUDIT LOGS
-export async function fetchAuditLogs(filters?: { entityType?: string; limit?: number }) {
+export async function logAudit(params: {
+  personId: string | null;
+  action: string;
+  changes: any;
+  performedBy: string;
+}): Promise<DbResponse<boolean>> {
   try {
-    let query = supabase
-      .from('audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const sql = `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, changes) 
+      VALUES ($1, $2, $3, $4, $5)`;
 
-    if (filters?.entityType) {
-      query = query.eq('entity_type', filters.entityType)
-    }
+    await pool.query(sql, [
+      params.performedBy, params.action, "employee", params.personId, params.changes
+    ]);
 
-    if (filters?.limit) {
-      query = query.limit(filters.limit)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error fetching audit logs:', error)
-      return { data: [], error: error.message }
-    }
-
-    return { data, error: null }
-  } catch (err) {
-    console.error('Unexpected error fetching audit logs:', err)
-    return { data: [], error: 'Failed to fetch audit logs' }
+    return { data: true, error: null };
+  } catch (error: any) {
+    console.error("Error logging audit:", error);
+    return { data: null, error: error.message };
   }
 }
 
-async function logAuditEntry(log: Database['public']['Tables']['audit_logs']['Insert']) {
+export function getCurrentUser() {
+  return {
+    id: "user-1",
+    name: "System Administrator",
+    role: "HR_ADMIN",
+    email: "admin@company.com",
+  };
+}
+
+export async function checkDatabaseHealth(): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('audit_logs')
-      .insert([log])
-
-    if (error) {
-      console.error('Error logging audit entry:', error)
-    }
-  } catch (err) {
-    console.error('Unexpected error logging audit entry:', err)
+    await pool.query("SELECT 1");
+    return true;
+  } catch (error) {
+    console.error("Database health check failed:", error);
+    return false;
   }
 }
+
+export { pool };
