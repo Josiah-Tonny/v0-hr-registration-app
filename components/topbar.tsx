@@ -40,21 +40,18 @@ export function Topbar() {
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-<<<<<<< HEAD
             <p className="text-sm font-600 text-foreground">{mockCurrentUser.name}</p>
             <p className="text-xs text-muted-foreground">{mockCurrentUser.role.replace(/_/g, ' ')}</p>
           </div>
           <Avatar className="h-8 w-8 border border-border/40">
             <AvatarImage src={mockCurrentUser.avatar || "/placeholder.svg"} alt={mockCurrentUser.name} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-600">{mockCurrentUser.name.charAt(0)}</AvatarFallback>
-=======
             <p className="text-sm font-500 text-foreground">{currentUser.name}</p>
             <p className="text-xs text-muted-foreground">{currentUser.role.replace(/_/g, ' ')}</p>
           </div>
           <Avatar className="border border-border/50 bg-secondary/50">
             <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.name} />
             <AvatarFallback className="bg-gradient-to-br from-accent via-accent to-[hsl(var(--accent-secondary))] text-white font-bold">{currentUser.name.charAt(0)}</AvatarFallback>
->>>>>>> 856197f (feat: Add API routes for departments, faculties, and health check)
           </Avatar>
         </div>
       </div>
