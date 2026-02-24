@@ -1,0 +1,28 @@
+[build]
+  # Build command for Next.js
+  command = "npm run build"
+  
+  # Directory to deploy (Next.js build output)
+  publish = ".next"
+
+[build.environment]
+  # Use npm instead of pnpm
+  NPM_FLAGS = "--prefer-offline --no-audit"
+  
+  # Node.js version (ensure compatibility)
+  NODE_VERSION = "18"
+
+# Redirects for Next.js client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
