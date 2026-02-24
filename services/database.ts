@@ -107,27 +107,22 @@ export async function fetchPersonById(id: string): Promise<DbResponse<Person>> {
   }
 }
 
-export async function createPerson(person: Omit<Person, "id" | "created_at" | "updated_at">): Promise<DbResponse<Person>> {
+export async function createPerson(person: Omit<Person, "id" | "createdAt" | "updatedAt">): Promise<DbResponse<Person>> {
   try {
     const sql = `INSERT INTO employees (
-      employee_id, first_name, middle_name, last_name, email, secondary_email, 
-      phone_number, secondary_phone_number, date_of_birth, gender, nationality, 
-      id_number, passport_number, residential_address, postal_code, city, country, 
-      department_id, faculty_id, position, position_grade, work_location, 
-      shift_information, status, category, category_details, start_date, 
-      end_date, expected_end_date
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
+      employee_id, first_name, last_name, email, phone_number, date_of_birth, gender, nationality, 
+      id_number, department_id, faculty_id, position, status, category_details, start_date, 
+      end_date, expected_end_date, emergency_contact, emergency_contact_phone, created_by
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
     RETURNING id`;
 
     const result = await pool.query(sql, [
-      person.employee_id, person.first_name, person.middle_name, person.last_name,
-      person.email, person.secondary_email, person.phone_number, person.secondary_phone_number,
-      person.date_of_birth, person.gender, person.nationality, person.id_number,
-      person.passport_number, person.residential_address, person.postal_code, person.city,
-      person.country, person.department_id, person.faculty_id, person.position,
-      person.position_grade, person.work_location, person.shift_information, person.status,
-      person.category, JSON.stringify(person.categoryDetails || {}), person.start_date,
-      person.end_date, person.expected_end_date
+      `EMP-${Date.now()}`, person.firstName, person.lastName, person.email, person.phoneNumber,
+      person.dateOfBirth, person.gender, person.nationality, person.personalIdNumber,
+      person.department, person.faculty, person.position, person.status,
+      JSON.stringify(person.categoryDetails || {}), person.engagementDates.startDate,
+      person.engagementDates.endDate, person.engagementDates.expectedEndDate,
+      person.emergencyContact, person.emergencyContactPhone, person.createdBy
     ]);
 
     return fetchPersonById(result.rows[0].id);
